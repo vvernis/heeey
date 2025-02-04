@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "41099816563",
+    "project_id": "heeey-8520d",
+    "storage_bucket": "heeey-8520d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:41099816563:android:d74e72c34acbcf987f0406",
+        "android_client_info": {
+          "package_name": "com.example.heeey"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkj7C9UlOeWyq-K3NGGkK2vPfNZVqd0ns"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
