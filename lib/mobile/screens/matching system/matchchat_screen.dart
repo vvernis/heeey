@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+// Define the color palette
+const Color darkCharcoal = Color(0xFF29292B);
+const Color offBlack = Color(0xFF343436);
+const Color vividYellow = Color(0xFFd7ed73);
+const Color lightGray = Color(0xFFF0F0E6);
+
 class ChatScreen extends StatefulWidget {
   final String chatId;
   final String senderId; // Current user's ID
@@ -74,13 +80,13 @@ class _ChatScreenState extends State<ChatScreen> {
           // Background
           Container(
             decoration: const BoxDecoration(
-              color: Colors.white
+              color: darkCharcoal
             ),
           ),
           Column(
             children: [
               AppBar(
-                backgroundColor: Colors.white, 
+                backgroundColor: darkCharcoal, 
                 elevation: 0,
                 title: FutureBuilder<String>(
                   future: fetchUserName(widget.receiverId), // Fetch receiver's name
@@ -93,16 +99,19 @@ class _ChatScreenState extends State<ChatScreen> {
                     }
                     return Text(
                       snapshot.data ?? 'Unknown User',
-                      style: const TextStyle(color: Colors.black),
+                      style: const TextStyle(
+                    fontFamily: 'Karla',
+                    color: lightGray,
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                  ),
                     );
                   },
                 ),
                 leading: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.black),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
+                  icon: const Icon(Icons.arrow_back_ios, color: lightGray, size: 21),
+                  onPressed: () => Navigator.pop(context),
+                ),
               ),
               Expanded(
                 child: StreamBuilder<QuerySnapshot>(
@@ -125,7 +134,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
                     if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                       return const Center(
-                        child: Text('No messages yet.', style: TextStyle(color: Colors.black)),
+                        child: Text('No messages yet.', style: TextStyle(color: lightGray)),
                       );
                     }
 
@@ -144,14 +153,14 @@ class _ChatScreenState extends State<ChatScreen> {
                             margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                             padding: const EdgeInsets.all(12.0),
                             decoration: BoxDecoration(
-                              color: isMe ? Colors.black : const Color(0xFFF5F5F5), // Light Gray
+                              color: isMe ? vividYellow : lightGray, // Light Gray
                               borderRadius: BorderRadius.circular(12.0),
                             ),
                             child: Text(
                               message['message'],
                               style: TextStyle(
                                 fontFamily: 'Karla',
-                                color: isMe ? Colors.white : Colors.black,
+                                color: isMe ? darkCharcoal : offBlack,
                               ),
                             ),
                           ),
@@ -165,7 +174,7 @@ class _ChatScreenState extends State<ChatScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 22),
                 decoration: const BoxDecoration(
-                  color: Colors.white,
+                  color: darkCharcoal,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                 ),
                 child: Row(
@@ -173,12 +182,12 @@ class _ChatScreenState extends State<ChatScreen> {
                     Expanded(
                       child: TextField(
                         controller: _messageController,
-                        style: const TextStyle(color: Colors.black),
+                        style: const TextStyle(color: darkCharcoal),
                         decoration: InputDecoration(
                           hintText: 'Type your message...',
-                          hintStyle: const TextStyle(color: Colors.black),
+                          hintStyle: const TextStyle(color: darkCharcoal),
                           filled: true,
-                          fillColor: const Color(0xFFF5F5F5),
+                          fillColor: lightGray,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(24),
                             borderSide: BorderSide.none,
@@ -187,16 +196,20 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.send, color: Colors.black), // Purple
+                      icon: const Icon(Icons.send, color: vividYellow), // Purple
                       onPressed: () async {
                         if (_messageController.text.trim().isNotEmpty) {
                           final messageText = _messageController.text.trim();
+                          
 
                           try {
                             final senderSnapshot = await FirebaseFirestore.instance
                                 .collection('users')
                                 .doc(widget.senderId) // Fetching the sender (current user)
                                 .get();
+
+                            final senderName = senderSnapshot.data()?['name'] ?? 'Someone';
+
 
                             // Add the message to Firestore
                             await FirebaseFirestore.instance
@@ -218,6 +231,16 @@ class _ChatScreenState extends State<ChatScreen> {
                                 .update({
                               'lastMessage': messageText,
                               'lastMessageTimestamp': FieldValue.serverTimestamp(),
+                            });
+
+                             // Add a new notification to Firestore
+                            await FirebaseFirestore.instance.collection('notifications').add({
+                              'isRead': false, // New notifications are unread
+                              'message': "New message from $senderName: $messageText",
+                              'receiverId': widget.receiverId,
+                              'senderId': widget.senderId,
+                              'timestamp': FieldValue.serverTimestamp(),
+                              'type': 'newMessage',
                             });
 
                             // Clear the message field

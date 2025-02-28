@@ -1,6 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+
+// Define your color constants
+const Color darkCharcoal = Color(0xFF29292B);
+const Color offBlack = Color(0xFF343436);
+const Color vividYellow = Color(0xFFd7ed73);
+const Color lightGray = Color(0xFFF0F0E6);
+
+
+// Updated password regex: 8+ chars, at least one uppercase, one digit, and one special character
+final RegExp _passwordRegex = RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$');
+
 class VerificationWidget extends StatefulWidget {
   const VerificationWidget({super.key});
 
@@ -15,10 +26,25 @@ class _VerificationWidgetState extends State<VerificationWidget> {
   bool _confirmPasswordVisible = false;
 
   Future<void> setNewPassword() async {
-    if (_newPasswordController.text.trim() !=
-        _confirmPasswordController.text.trim()) {
+    final newPassword = _newPasswordController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
+
+    // Check if passwords match.
+    if (newPassword != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Passwords do not match.')),
+      );
+      return;
+    }
+
+    // Validate the new password using regex.
+    if (!_passwordRegex.hasMatch(newPassword)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Password must be at least 8 characters long and include at least one uppercase letter, one digit, and one special character.',
+          ),
+        ),
       );
       return;
     }
@@ -27,12 +53,16 @@ class _VerificationWidgetState extends State<VerificationWidget> {
       User? user = FirebaseAuth.instance.currentUser;
 
       if (user != null) {
-        await user.updatePassword(_newPasswordController.text.trim());
+        await user.updatePassword(newPassword);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Password updated successfully.')),
         );
 
-        Navigator.pushNamed(context, '/profile-setup', arguments: {'uid': user.uid}, );
+        Navigator.pushNamed(
+          context,
+          '/profile-setup',
+          arguments: {'uid': user.uid},
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('No user is signed in.')),
@@ -55,7 +85,7 @@ class _VerificationWidgetState extends State<VerificationWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: darkCharcoal,
       body: Padding(
         padding: const EdgeInsets.all(26.0),
         child: Column(
@@ -66,8 +96,8 @@ class _VerificationWidgetState extends State<VerificationWidget> {
               onTap: () => Navigator.pop(context),
               child: const Icon(
                 Icons.arrow_back,
-                color: Colors.black,
-                size: 24,
+                color: lightGray,
+                size: 21,
               ),
             ),
             const SizedBox(height: 21),
@@ -77,7 +107,7 @@ class _VerificationWidgetState extends State<VerificationWidget> {
                 fontFamily: 'Karla',
                 fontSize: 24,
                 fontWeight: FontWeight.w600,
-                color: Colors.black,
+                color: lightGray,
               ),
             ),
             const SizedBox(height: 16),
@@ -85,13 +115,15 @@ class _VerificationWidgetState extends State<VerificationWidget> {
               'Account found with your email. Please set up your password.',
               style: TextStyle(
                 fontFamily: 'Karla',
-                color: Colors.black,
+                color: Colors.grey,
               ),
             ),
             const SizedBox(height: 20),
             TextFormField(
+              cursorColor: lightGray,
               controller: _newPasswordController,
               obscureText: !_newPasswordVisible,
+              style: TextStyle(color: lightGray),
               decoration: InputDecoration(
                 hintText: 'Enter password',
                 hintStyle: const TextStyle(
@@ -102,12 +134,17 @@ class _VerificationWidgetState extends State<VerificationWidget> {
                   borderRadius: BorderRadius.circular(12),
                   borderSide: const BorderSide(color: Colors.black),
                 ),
+                focusedBorder:OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: lightGray),
+                ), 
                 filled: true,
-                fillColor: const Color(0xFFF5F5F5),
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                fillColor: offBlack,
+                contentPadding: const EdgeInsets.symmetric(
+                    vertical: 20, horizontal: 20),
                 suffixIcon: IconButton(
                   icon: Icon(
+                    color: const Color(0xFF747688),
                     _newPasswordVisible
                         ? Icons.visibility
                         : Icons.visibility_off,
@@ -122,8 +159,10 @@ class _VerificationWidgetState extends State<VerificationWidget> {
             ),
             const SizedBox(height: 16),
             TextFormField(
+              cursorColor: lightGray,
               controller: _confirmPasswordController,
               obscureText: !_confirmPasswordVisible,
+              style: TextStyle(color: lightGray),
               decoration: InputDecoration(
                 hintText: 'Repeat password',
                 hintStyle: const TextStyle(
@@ -134,12 +173,17 @@ class _VerificationWidgetState extends State<VerificationWidget> {
                   borderRadius: BorderRadius.circular(12),
                   borderSide: const BorderSide(color: Colors.black),
                 ),
+                focusedBorder:OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: lightGray),
+                ), 
                 filled: true,
-                fillColor: const Color(0xFFF5F5F5),
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                fillColor: offBlack,
+                contentPadding: const EdgeInsets.symmetric(
+                    vertical: 20, horizontal: 20),
                 suffixIcon: IconButton(
                   icon: Icon(
+                    color: const Color(0xFF747688),
                     _confirmPasswordVisible
                         ? Icons.visibility
                         : Icons.visibility_off,
@@ -157,7 +201,7 @@ class _VerificationWidgetState extends State<VerificationWidget> {
               onPressed: setNewPassword,
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 56),
-                backgroundColor: const Color(0xFF6A0DAD),
+                backgroundColor: vividYellow,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -166,7 +210,7 @@ class _VerificationWidgetState extends State<VerificationWidget> {
                 'Sign up',
                 style: TextStyle(
                   fontFamily: 'Karla',
-                  color: Colors.white,
+                  color: darkCharcoal,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),

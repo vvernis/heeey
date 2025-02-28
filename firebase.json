@@ -41,7 +41,7 @@
   "functions": [
     {
       "source": "functions",
-      "codebase": "default",
+      "codebase": "heeey",
       "ignore": [
         "node_modules",
         ".git",
@@ -54,5 +54,19 @@
         "npm --prefix \"$RESOURCE_DIR\" run build"
       ]
     }
-  ]
+  ],
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
 }

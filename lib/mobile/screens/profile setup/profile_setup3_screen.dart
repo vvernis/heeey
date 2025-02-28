@@ -4,6 +4,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:country_list_pick/country_list_pick.dart';
 import 'profile_setup4_screen.dart';
 
+const Color darkCharcoal = Color(0xFF29292B);
+const Color offBlack = Color(0xFF343436);
+const Color vividYellow = Color(0xFFd7ed73);
+const Color lightGray = Color(0xFFF0F0E6);
+
 class ProfileSetupStep3 extends StatefulWidget {
   final String uid;
   final String aboutMe;
@@ -61,12 +66,13 @@ class _ProfileSetupStep3State extends State<ProfileSetupStep3> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Where are you from?'),
-        backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(color: Colors.black),
+        title: const Text('Profile Creation'),
+        backgroundColor: darkCharcoal,
+        iconTheme: const IconThemeData(color: lightGray),
+        titleTextStyle: TextStyle(fontFamily: 'Karla', fontSize: 17, fontWeight: FontWeight.bold, color: lightGray),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_ios, color: lightGray, size: 21,),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -75,13 +81,24 @@ class _ProfileSetupStep3State extends State<ProfileSetupStep3> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            Text(
+              'Step 3: Where are you from?',
+              style: const TextStyle(
+                fontFamily: 'Karla',
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: lightGray,
+              ),
+        ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
               child: _buildInputContainer(
                 child: CountryListPick(
                   appBar: AppBar(
-                    backgroundColor: Colors.pink,
+                    backgroundColor: Colors.white,
                     title: Text('Select Your Country'),
+                    titleTextStyle: TextStyle(color: offBlack, fontSize: 17, fontFamily: "Karla", fontWeight: FontWeight.bold),
+                    iconTheme: const IconThemeData(color: offBlack, size: 21),
                   ),
                   theme: CountryTheme(
                     isShowFlag: true,
@@ -89,6 +106,9 @@ class _ProfileSetupStep3State extends State<ProfileSetupStep3> {
                     isShowCode: false,
                     isDownIcon: true,
                     showEnglishName: true,
+                    
+                  //  labelColor: Colors.black,     
+                    alphabetSelectedBackgroundColor: offBlack
                   ),
                   initialSelection: '+1',
                   onChanged: (CountryCode? code) {
@@ -105,7 +125,7 @@ class _ProfileSetupStep3State extends State<ProfileSetupStep3> {
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF911240),
+                  backgroundColor: vividYellow,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -117,7 +137,7 @@ class _ProfileSetupStep3State extends State<ProfileSetupStep3> {
                   'Next',
                   style: TextStyle(
                     fontFamily: 'Karla',
-                    color: Colors.white,
+                    color: offBlack,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -133,16 +153,16 @@ class _ProfileSetupStep3State extends State<ProfileSetupStep3> {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: offBlack,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            blurRadius: 10,
-            spreadRadius: 2,
-            offset: const Offset(0, 4),
-          ),
-        ],
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.5),
+                        spreadRadius: 1,
+                        blurRadius: 3,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
       ),
       child: child,
     );

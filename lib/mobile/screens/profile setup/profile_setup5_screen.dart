@@ -4,7 +4,12 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:convert';
 import 'package:image/image.dart' as img;
-import 'profile_preview_screen.dart';
+
+const Color darkCharcoal = Color(0xFF29292B);
+const Color offBlack = Color(0xFF343436);
+const Color vividYellow = Color(0xFFd7ed73);
+const Color lightGray = Color(0xFFF0F0E6);
+
 
 class ProfileSetupStep5 extends StatefulWidget {
   final String uid;
@@ -97,12 +102,14 @@ class _ProfileSetupStep5State extends State<ProfileSetupStep5> {
         'images': base64Images,
       }, SetOptions(merge: true));
 
+      Navigator.pushNamed(context, '/home');
+      /*
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => ProfilePreview(uid: widget.uid),
         ),
-      );
+      );*/
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to save data: $e')),
@@ -115,13 +122,13 @@ class _ProfileSetupStep5State extends State<ProfileSetupStep5> {
 Widget build(BuildContext context) {
   return Scaffold(
     appBar: AppBar(
-      title: const Text("That's Me"),
-      centerTitle: true,
-      backgroundColor: Colors.white,
-      elevation: 0,
-      iconTheme: const IconThemeData(color: Colors.black),
-      leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+      title: const Text('Profile Creation'),
+        backgroundColor: darkCharcoal,
+        iconTheme: const IconThemeData(color: lightGray),
+        titleTextStyle: TextStyle(fontFamily: 'Karla', fontSize: 17, fontWeight: FontWeight.bold, color: lightGray),
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: lightGray, size: 21,),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -133,16 +140,26 @@ Widget build(BuildContext context) {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              "Show us how you see yourself by uploading images that describe yourself.",
-              style: TextStyle(
-                fontFamily: 'Karla',
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
+             Text(
+                    'Step 5: What defines you?',
+                    style: const TextStyle(
+                      fontFamily: 'Karla',
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: lightGray,
+                    ),
               textAlign: TextAlign.center,
             ),
+             SizedBox(height: 5),
+                Text(
+                  "Choose 9 pictures that describes you according to the prompt.",
+                  style: TextStyle(
+                    fontFamily: 'Karla',
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
             const SizedBox(height: 15),
             GridView.builder(
               physics: const NeverScrollableScrollPhysics(), // Prevent inner scrolling
@@ -163,13 +180,14 @@ Widget build(BuildContext context) {
                         height: 110,
                         width: 110,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF3D9EE),
+                          color: lightGray,
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
+                              color: Colors.black.withOpacity(0.5),
+                              spreadRadius: 1,
+                              blurRadius: 3,
+                              offset: Offset(0, 1),
                             ),
                           ],
                         ),
@@ -182,9 +200,9 @@ Widget build(BuildContext context) {
                                 ),
                               )
                             : const Icon(
-                                Icons.add_a_photo,
+                                Icons.add_a_photo_outlined,
                                 size: 50,
-                                color: Colors.grey,
+                                color: offBlack,
                               ),
                       ),
                     ),
@@ -192,7 +210,7 @@ Widget build(BuildContext context) {
                     Text(
                       _captions[index],
                       textAlign: TextAlign.center,
-                      style: const TextStyle(fontFamily: 'Karla', fontSize: 12),
+                      style: const TextStyle(fontFamily: 'Karla', fontSize: 12, color: lightGray),
                     ),
                   ],
                 );
@@ -201,7 +219,7 @@ Widget build(BuildContext context) {
             const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF911240),
+                backgroundColor: vividYellow,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -210,10 +228,10 @@ Widget build(BuildContext context) {
               ),
               onPressed: _saveData,
               child: const Text(
-                'Next',
+                'Complete Profile',
                 style: TextStyle(
                   fontFamily: 'Karla',
-                  color: Colors.white,
+                  color: offBlack,
                   fontWeight: FontWeight.bold,
                 ),
               ),

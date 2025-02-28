@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:heeey/mobile/screens/profile%20setup/profile_setup5_screen.dart';
 import 'set_password.dart';
+
+const Color darkCharcoal = Color(0xFF29292B);
+const Color offBlack = Color(0xFF343436);
+const Color vividYellow = Color(0xFFd7ed73);
+const Color lightGray = Color(0xFFF0F0E6);
 
 class SignUpWidget extends StatefulWidget {
   const SignUpWidget({super.key});
@@ -46,7 +52,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: darkCharcoal,
       body: Padding(
         padding: const EdgeInsets.all(26.0),
         child: Column(
@@ -57,7 +63,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
               onTap: () => Navigator.pop(context),
               child: const Icon(
                 Icons.arrow_back,
-                color: Colors.black,
+                color: lightGray,
                 size: 24,
               ),
             ),
@@ -68,6 +74,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                 fontFamily: 'Karla',
                 fontSize: 24,
                 fontWeight: FontWeight.w600,
+                color: lightGray
               ),
             ),
             const SizedBox(height: 16),
@@ -75,48 +82,61 @@ class _SignUpWidgetState extends State<SignUpWidget> {
               'Please use the email and temporary password provided by your admin to sign up.',
               style: TextStyle(
                 fontFamily: 'Karla',
-                color: Color(0xFF747688),
+                color: Color.fromARGB(255, 121, 123, 137),
               ),
             ),
             const SizedBox(height: 20),
             TextFormField(
+              cursorColor: lightGray,
               controller: _emailController,
+              style: TextStyle(color: lightGray),
               decoration: InputDecoration(
                 hintText: 'Email',
                 hintStyle: const TextStyle(
                   fontFamily: 'Karla',
-                  color: Color(0x9A747688),
+                  color: Color(0xFF747688),
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: const BorderSide(color: Color(0xFFE4DFDF)),
                 ),
+                focusedBorder:OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: lightGray),
+                ), 
                 filled: true,
-                fillColor: const Color(0xFFF9FAFB),
+                fillColor: offBlack,
                 contentPadding:
                     const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
               ),
             ),
             const SizedBox(height: 16),
             TextFormField(
+              cursorColor: lightGray,
               controller: _tempPasswordController,
               obscureText: !_tempPasswordVisible,
+              style: TextStyle(color: lightGray),
               decoration: InputDecoration(
                 hintText: 'Temporary Password',
                 hintStyle: const TextStyle(
                   fontFamily: 'Karla',
-                  color: Color(0x9A747688),
+                  color: Color(0xFF747688),
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFFCCCCCC)),
+                  borderSide: const BorderSide(color: Color.fromARGB(255, 255, 255, 255)),
                 ),
+                focusedBorder:OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: lightGray),
+                ), 
                 filled: true,
-                fillColor: const Color(0xFFF9FAFB),
+                fillColor: offBlack,
                 contentPadding:
                     const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
                 suffixIcon: IconButton(
                   icon: Icon(
+                    color: Color(0xFF747688),
                     _tempPasswordVisible
                         ? Icons.visibility
                         : Icons.visibility_off,
@@ -134,7 +154,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
               onPressed: signInWithTemporaryCredentials,
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 56),
-                backgroundColor: Color(0xFF911240),
+                backgroundColor: vividYellow,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -143,7 +163,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                 'Continue',
                 style: TextStyle(
                   fontFamily: 'Karla',
-                  color: Colors.white,
+                  color: darkCharcoal,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),

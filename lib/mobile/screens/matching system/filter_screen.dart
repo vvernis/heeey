@@ -3,6 +3,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'matching_screen.dart';
 
+const Color darkCharcoal = Color(0xFF29292B);
+const Color offBlack = Color(0xFF343436);
+const Color vividYellow = Color(0xFFd7ed73);
+const Color lightGray = Color(0xFFF0F0E6);
+
 class FiltersScreen extends StatefulWidget {
   const FiltersScreen({super.key});
 
@@ -11,31 +16,83 @@ class FiltersScreen extends StatefulWidget {
 }
 
 class _FiltersScreenState extends State<FiltersScreen> {
-  final TextEditingController placeOfInterestController =
-      TextEditingController();
+  final TextEditingController otherInterestController = TextEditingController();
   DateTime? earliestDate;
   DateTime? latestDate;
+  String? selectedActivity;
+  bool showOtherTextField = false;
 
-  // Function to pick a date
-  Future<void> _pickDate(BuildContext context, bool isEarliest) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2030),
-    );
-    if (picked != null) {
-      setState(() {
-        if (isEarliest) {
-          earliestDate = picked;
-        } else {
-          latestDate = picked;
-        }
-      });
-    }
+  List<Map<String, dynamic>> activities = [
+    {'name': 'Sport', 'icon': Icons.directions_run},
+    {'name': 'Attractions', 'icon': Icons.attractions},
+    {'name': 'Museums', 'icon': Icons.museum},
+    {'name': 'Talk', 'icon': Icons.record_voice_over},
+    {'name': 'Movie', 'icon': Icons.movie},
+    {'name': 'Eat', 'icon': Icons.restaurant},
+    {'name': 'Study', 'icon': Icons.school},
+    {'name': 'Gaming', 'icon': Icons.games},
+    {'name': 'Others', 'icon': Icons.add_circle_outline},
+  ];
+
+  Future<void> _selectDate(BuildContext context, {required bool isStart}) async {
+  final DateTime now = DateTime.now();
+  DateTime firstDate;
+  DateTime initialDate;
+
+  if (isStart) {
+    // For start date, you may allow selecting from today.
+    firstDate = now;
+    initialDate = earliestDate ?? now;
+  } else {
+    // For end date, set firstDate to the later of today's date or the selected start date.
+    firstDate = (earliestDate != null && earliestDate!.isAfter(now))
+        ? earliestDate!
+        : now;
+    initialDate = latestDate ?? firstDate;
   }
 
-  Future<void> _applyFilters() async {
+  final DateTime? picked = await showDatePicker(
+    context: context,
+    initialDate: initialDate,
+    firstDate: firstDate,
+    lastDate: DateTime(2100),
+    builder: (context, child) {
+      return Theme(
+        data: ThemeData(
+          colorScheme: ColorScheme.light(
+            primary: vividYellow, // header background color
+            onPrimary: offBlack, // header text color
+            onSurface: darkCharcoal, // body text color
+          ),
+          dialogBackgroundColor: darkCharcoal,
+          textButtonTheme: TextButtonThemeData(
+            style: TextButton.styleFrom(
+              foregroundColor: darkCharcoal,
+              backgroundColor: vividYellow,
+            ),
+          ),
+        ),
+        child: child!,
+      );
+    },
+  );
+
+  if (picked != null) {
+    setState(() {
+      if (isStart) {
+        earliestDate = picked;
+        // Optionally clear latestDate if it's before the new start date.
+        if (latestDate != null && latestDate!.isBefore(picked)) {
+          latestDate = null;
+        }
+      } else {
+        latestDate = picked;
+      }
+    });
+  }
+}
+
+  void _applyFilters() async {
     final currentUserId = FirebaseAuth.instance.currentUser?.uid;
     if (currentUserId == null) {
       return; // User is not logged in
@@ -43,17 +100,19 @@ class _FiltersScreenState extends State<FiltersScreen> {
 
     final filters = {
       'owner': currentUserId,
-      'placeOfInterest': placeOfInterestController.text.trim(),
+      'activity': selectedActivity ?? 'Others',
+      'otherActivity': otherInterestController.text.trim(),
       'earliestDate': earliestDate,
       'latestDate': latestDate,
     };
 
-    try {
+     try {
       // Check for duplicates in the database
       final query = await FirebaseFirestore.instance
           .collection('filters')
           .where('owner', isEqualTo: currentUserId)
-          .where('placeOfInterest', isEqualTo: filters['placeOfInterest'])
+          .where('activity', isEqualTo: filters['activity'])
+          .where('otherActivity', isEqualTo: filters['otherActivity'])
           .where('earliestDate', isEqualTo: filters['earliestDate'])
           .where('latestDate', isEqualTo: filters['latestDate'])
           .get();
@@ -62,7 +121,8 @@ class _FiltersScreenState extends State<FiltersScreen> {
         // Save the filter only if it's not a duplicate
         await FirebaseFirestore.instance.collection('filters').add({
           'owner': currentUserId,
-          'placeOfInterest': filters['placeOfInterest'],
+          'activity': filters['activity'],
+          'otherActivity': filters['otherActivity'],
           'earliestDate': filters['earliestDate'],
           'latestDate': filters['latestDate'],
         });
@@ -89,126 +149,132 @@ class _FiltersScreenState extends State<FiltersScreen> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Filters', style: TextStyle(fontFamily: 'Karla', color: Colors.black)),
+        title: const Text('Filter Your Match', style: TextStyle(fontFamily:'Karla', fontSize: 17, fontWeight: FontWeight.bold, color:  lightGray)),
         centerTitle: true,
+        backgroundColor: darkCharcoal,
         elevation: 0,
-        backgroundColor: Colors.white,
-         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: lightGray, size: 21,),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Place of Interest Section
-            const Text(
-              'Place of Interest',
-              style: TextStyle(
-                fontFamily: 'Karla', 
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+            Text(
+              'Choose Your Preferred Activity',
+              style: TextStyle(fontFamily:'Karla', fontSize: 15, fontWeight: FontWeight.bold, color:  lightGray)
               ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: placeOfInterestController,
-              decoration: InputDecoration(
-                hintText: 'e.g. Universal Studios Singapore',
-                filled: true,
-                fillColor: const Color(0xFFF2E8FF),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
+               const SizedBox(height: 8),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
               ),
+              itemCount: activities.length,
+              itemBuilder: (context, index) {
+                var activity = activities[index];
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedActivity = activity['name'];
+                      showOtherTextField = activity['name'] == 'Others';
+                    });
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: selectedActivity == activity['name'] ? vividYellow : lightGray,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(activity['icon'], size: 30, color: selectedActivity == activity['name'] ? offBlack : offBlack),
+                        Text(activity['name'], style: TextStyle(color: selectedActivity == activity['name'] ?offBlack : offBlack)),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
-            const SizedBox(height: 20),
+           if (showOtherTextField)
+  TextField(
+    controller: otherInterestController,
+    style: const TextStyle(color: lightGray), // Text color
+    decoration: InputDecoration(
+      labelText: 'Specify other activity',
+      labelStyle: const TextStyle(color: lightGray), // Label color
+      filled: true,
+      fillColor: offBlack, // Background color of input field
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8), // Rounded corners
+        borderSide: const BorderSide(color: vividYellow), // Border color
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: vividYellow), // Default border
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: vividYellow, width: 2), // Border when focused
+      ),
+      hintText: 'Enter activity...',
+      hintStyle: const TextStyle(color: Colors.grey), // Hint text color
+    ),
+  ),
 
-            // Preferred Period Section
-            const Text(
-              'Preferred Period',
-              style: TextStyle(
-                fontFamily: 'Karla', 
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+            const SizedBox(height: 10),
+            Text(
+              'Choose Your Preferred Period',
+              style: TextStyle(fontFamily:'Karla', fontSize: 15, fontWeight: FontWeight.bold, color:  lightGray)
               ),
-            ),
-            const SizedBox(height: 12),
+               const SizedBox(height: 8),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => _pickDate(context, true),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFF2E8FF),
-                      foregroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: Text(
-                      earliestDate != null
-                          ? "Earliest: ${earliestDate!.toLocal()}".split(' ')[0]
-                          : "Earliest Date",
-                      style: const TextStyle(fontFamily: 'Karla', fontSize: 14),
-                    ),
+                ElevatedButton(
+                  onPressed: () => _selectDate(context, isStart: true),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: lightGray,
+                    foregroundColor: offBlack,
+                    padding: EdgeInsets.all(16.0)
                   ),
+                  child: Text(earliestDate == null ? 'Earliest: Add date' : 'Earliest: ${earliestDate!.toLocal().toString().split(' ')[0]}'),
                 ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => _pickDate(context, false),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFFF4E5),
-                      foregroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: Text(
-                      latestDate != null
-                          ? "Latest: ${latestDate!.toLocal()}".split(' ')[0]
-                          : "Latest Date",
-                      style: const TextStyle(fontFamily: 'Karla', fontSize: 14),
-                    ),
+                ElevatedButton(
+                  onPressed: () => _selectDate(context, isStart: false),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: lightGray,
+                    foregroundColor: offBlack,
+                     padding: EdgeInsets.all(16.0)
                   ),
+                  child: Text(latestDate == null ? 'Latest: Add date' : 'Latest: ${latestDate!.toLocal().toString().split(' ')[0]}'),
                 ),
               ],
             ),
             const SizedBox(height: 20),
-
-            // Apply Filters Button
             Center(
               child: ElevatedButton(
                 onPressed: _applyFilters,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFFC764),
-                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.black,
+                  foregroundColor: lightGray,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(30),
                   ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 40,
-                    vertical: 16,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                 ),
-                child: const Text(
-                  'GO',
-                  style: TextStyle(fontFamily: 'Karla', fontSize: 16, fontWeight: FontWeight.bold),
-                ),
+                child: const Text('Start Matching'),
               ),
             ),
           ],

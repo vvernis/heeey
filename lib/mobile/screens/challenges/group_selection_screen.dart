@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'groupchat_screen.dart';
+
+const Color darkCharcoal = Color(0xFF29292B);
+const Color offBlack = Color(0xFF343436);
+const Color vividYellow = Color(0xFFd7ed73);
+const Color lightGray = Color(0xFFF0F0E6);
 
 class GroupSelectionScreen extends StatelessWidget {
   final String challengeID;
@@ -21,31 +25,52 @@ class GroupSelectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) {
+      return Scaffold(
+        backgroundColor: darkCharcoal,
+        body: Center(
+          child: Text(
+            'Please log in to view groups.',
+            style: TextStyle(color: lightGray),
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
+      backgroundColor: darkCharcoal,
       appBar: AppBar(
-        title: const Text('Select a Group'),
+        title: const Text(
+          'Select a Group',
+          style: TextStyle(
+            fontFamily: 'Karla',
+            color: lightGray,
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
+        backgroundColor: darkCharcoal,
+        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          icon: const Icon(Icons.arrow_back_ios, color: lightGray, size: 21),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: FutureBuilder<bool>(
-        future: checkIfUserInGroup(userId!),
+        future: checkIfUserInGroup(userId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-
           if (snapshot.hasError) {
-            return const Center(
-              child: Text('Error checking group membership.'),
+            return Center(
+              child: Text(
+                'Error checking group membership.',
+                style: TextStyle(color: lightGray),
+              ),
             );
           }
-
           final isInGroup = snapshot.data ?? false;
 
           return Column(
@@ -56,12 +81,19 @@ class GroupSelectionScreen extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () => showCreateGroupDialog(context, userId),
                     style: ElevatedButton.styleFrom(
+                      backgroundColor: vividYellow,
                       minimumSize: const Size(double.infinity, 48),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text('Create Group'),
+                    child: const Text(
+                      'Create Group',
+                      style: TextStyle(
+                        color: darkCharcoal,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               Expanded(
@@ -74,62 +106,129 @@ class GroupSelectionScreen extends StatelessWidget {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     }
-
                     if (snapshot.hasError) {
-                      return const Center(
-                        child: Text('Error loading groups. Please try again later.'),
+                      return Center(
+                        child: Text(
+                          'Error loading groups. Please try again later.',
+                          style: TextStyle(color: lightGray),
+                        ),
                       );
                     }
-
                     if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                      return const Center(
-                        child: Text('No groups available.'),
+                      return Center(
+                        child: Text(
+                          'No groups available.',
+                          style: TextStyle(color: lightGray),
+                        ),
                       );
                     }
 
-                    return ListView.builder(
+                    return GridView.builder(
+                      padding: const EdgeInsets.all(16),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2, // Display groups in a 2-column grid
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: 1.1, // Adjusts square proportions
+                      ),
                       itemCount: snapshot.data!.docs.length,
                       itemBuilder: (context, index) {
                         final group = snapshot.data!.docs[index];
-                        final isUserInThisGroup = (group['members'] as List<dynamic>)
-                            .contains(userId);
+                        final isUserInThisGroup =
+                            (group['members'] as List<dynamic>).contains(userId);
+                        final currentPax = group['current_pax'] as int;
+                        final maxPax = group['max_pax'] as int;
+                        final List<dynamic> members = group['members'] ?? [];
 
-                        return ListTile(
-                          onTap: isUserInThisGroup
-                              ? null
-                              : () {
-                                  tryJoinGroup(group.id, challengeID).then((_) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Successfully joined the group!')),
-                                    );
-                                  }).catchError((e) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Failed to join group: $e')),
-                                    );
-                                  });
-                                },
-                          title: Text(group['groupName']),
-                          subtitle: Text(
-                              '${group['current_pax']} / ${group['max_pax']} members'),
-                          trailing: isUserInThisGroup
-                              ? const Text(
-                                  'In Group',
-                                  style: TextStyle(color: Colors.green),
-                                )
-                              : ElevatedButton(
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: offBlack,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // Display up to 4 user avatars
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: members.take(4).map((member) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 3),
+                                    child: CircleAvatar(
+                                      backgroundColor: vividYellow,
+                                      radius: 16,
+                                      child: Text(
+                                        member.toString().substring(0, 1).toUpperCase(),
+                                        style: const TextStyle(
+                                            color: darkCharcoal, fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                              const SizedBox(height: 7),
+                              // Group Name
+                              Text(
+                                group['groupName'],
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: lightGray,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 0),
+                              // Member Count
+                              Text(
+                                '$currentPax / $maxPax members',
+                                style: TextStyle(
+                                  color: lightGray.withOpacity(0.8),
+                                  fontSize: 12,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              // Join Button
+                              if (!isUserInThisGroup)
+                                ElevatedButton(
                                   onPressed: () {
-                                    tryJoinGroup(group.id, challengeID).then((_) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Successfully joined the group!')),
-                                      );
+                                    tryJoinGroup(group.id, userId).then((_) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                              content: Text(
+                                                  'Successfully joined the group!')));
                                     }).catchError((e) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('Failed to join group: $e')),
-                                      );
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(SnackBar(
+                                              content: Text(
+                                                  'Failed to join group: $e')));
                                     });
                                   },
-                                  child: const Text('Join'),
+                                  style: ElevatedButton.styleFrom(
+                                    minimumSize: const Size(80, 30),
+                                    backgroundColor: vividYellow,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'Join',
+                                    style: TextStyle(
+                                      color: darkCharcoal,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
+                              if (isUserInThisGroup)
+                                const Text(
+                                  'In Group',
+                                  style: TextStyle(
+                                    color: vividYellow,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                            ],
+                          ),
                         );
                       },
                     );
@@ -143,27 +242,24 @@ class GroupSelectionScreen extends StatelessWidget {
     );
   }
 
-  Future<void> tryJoinGroup(String groupId, String challengeId) async {
+
+  Future<void> tryJoinGroup(String groupId, String userId) async {
     final groupRef = FirebaseFirestore.instance.collection('groups').doc(groupId);
-    final challengeRef = FirebaseFirestore.instance.collection('challenges').doc(challengeId);
 
     await FirebaseFirestore.instance.runTransaction((transaction) async {
       final groupDoc = await transaction.get(groupRef);
-      final challengeDoc = await transaction.get(challengeRef);
-
-      if (!groupDoc.exists || !challengeDoc.exists) {
-        throw Exception('Group or challenge not found');
+      if (!groupDoc.exists) {
+        throw Exception('Group not found');
       }
-
       final currentSize = groupDoc['current_pax'] as int;
-      final maxSize = challengeDoc['max_participants'] as int;
-
+      final maxSize = groupDoc['max_pax'] as int;
       if (currentSize >= maxSize) {
         throw Exception('Group is full');
       }
-
+      // Update both current_pax and add the user to the "members" array.
       transaction.update(groupRef, {
         'current_pax': currentSize + 1,
+        'members': FieldValue.arrayUnion([userId]),
       });
     });
   }
@@ -175,12 +271,25 @@ class GroupSelectionScreen extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Create Group'),
+          backgroundColor: offBlack,
+          title: const Text(
+            'Create Group',
+            style: TextStyle(color: lightGray),
+          ),
           content: TextField(
             controller: groupNameController,
-            decoration: const InputDecoration(
+            style: const TextStyle(color: lightGray),
+            decoration: InputDecoration(
               labelText: 'Enter group name',
+              labelStyle: const TextStyle(color: vividYellow),
               hintText: 'Group Name',
+              hintStyle: TextStyle(color: lightGray.withOpacity(0.7)),
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: vividYellow),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: vividYellow),
+              ),
             ),
           ),
           actions: [
@@ -188,7 +297,10 @@ class GroupSelectionScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text('Cancel'),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: vividYellow),
+              ),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -198,11 +310,24 @@ class GroupSelectionScreen extends StatelessWidget {
                   await createNewGroup(context, userId, groupName);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Group name cannot be empty!')),
+                    const SnackBar(
+                      content: Text('Group name cannot be empty!',
+                          style: TextStyle(color: lightGray)),
+                      backgroundColor: offBlack,
+                    ),
                   );
                 }
               },
-              child: const Text('Create'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: vividYellow,
+              ),
+              child: const Text(
+                'Create',
+                style: TextStyle(
+                  color: darkCharcoal,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         );
@@ -210,31 +335,60 @@ class GroupSelectionScreen extends StatelessWidget {
     );
   }
 
-  Future<void> createNewGroup(BuildContext context, String userId, String groupName) async {
+  Future<void> createNewGroup(
+      BuildContext context, String userId, String groupName) async {
     final isUserInGroup = await checkIfUserInGroup(userId);
 
     if (isUserInGroup) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('You cannot create a group as you are already in one!')),
+        const SnackBar(
+            content: Text(
+                'You cannot create a group as you are already in one!',
+                style: TextStyle(color: lightGray)),
+            backgroundColor: offBlack),
       );
       return;
     }
 
     try {
+      final challengeSnapshot = await FirebaseFirestore.instance
+          .collection('challenges')
+          .doc(challengeID)
+          .get();
+      if (!challengeSnapshot.exists) {
+        throw Exception('Challenge not found');
+      }
+      final challengeData =
+          challengeSnapshot.data() as Map<String, dynamic>;
+      final maxPax = challengeData['max_participants'] != null
+          ? challengeData['max_participants'] as int
+          : 4;
+      final minPax = challengeData['min_participants'] != null
+          ? challengeData['min_participants'] as int
+          : 2;
+
       await FirebaseFirestore.instance.collection('groups').add({
         'challengeID': challengeID,
         'current_pax': 1,
-        'max_pax': 1, // Need to move to Admin
+        'max_pax': maxPax,
+        'min_pax': minPax,
         'groupName': groupName,
         'members': [userId],
+        'status': "pending"
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('New group created successfully!')),
+        const SnackBar(
+            content: Text('New group created successfully!',
+                style: TextStyle(color: lightGray)),
+            backgroundColor: offBlack),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to create group: $e')),
+        SnackBar(
+            content: Text('Failed to create group: $e',
+                style: const TextStyle(color: lightGray)),
+            backgroundColor: offBlack),
       );
     }
   }

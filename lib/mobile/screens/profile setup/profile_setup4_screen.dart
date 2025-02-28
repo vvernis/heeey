@@ -3,6 +3,11 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'profile_setup5_screen.dart';
 
+const Color darkCharcoal = Color(0xFF29292B);
+const Color offBlack = Color(0xFF343436);
+const Color vividYellow = Color(0xFFd7ed73);
+const Color lightGray = Color(0xFFF0F0E6);
+
 class ProfileSetupStep4 extends StatefulWidget {
   final String uid;
   final String aboutMe;
@@ -43,6 +48,27 @@ class _ProfileSetupStep4State extends State<ProfileSetupStep4> {
     'Finance',
     'Science',
   ];
+
+  final Map<String, IconData> interestIcons = {
+  'Travel': Icons.flight,
+  'Music': Icons.music_note,
+  'Food': Icons.restaurant,
+  'Games': Icons.videogame_asset,
+  'Sports': Icons.sports_soccer,
+  'Movies': Icons.movie,
+  'Adventure': Icons.explore,
+  'Nature': Icons.nature_people,
+  'Art': Icons.brush,
+  'Photography': Icons.camera_alt,
+  'Books': Icons.book,
+  'Technology': Icons.computer,
+  'Fitness': Icons.fitness_center,
+  'Cooking': Icons.kitchen,
+  'Fashion': Icons.checkroom,
+  'Finance': Icons.attach_money,
+  'Science': Icons.science,
+};
+
   final List<String> _selectedInterests = [];
 
   Future<void> _saveData() async {
@@ -85,11 +111,12 @@ class _ProfileSetupStep4State extends State<ProfileSetupStep4> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile Creation'),
-        backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(color: Colors.black),
+        backgroundColor: darkCharcoal,
+        iconTheme: const IconThemeData(color: lightGray),
+        titleTextStyle: TextStyle(fontFamily: 'Karla', fontSize: 17, fontWeight: FontWeight.bold, color: lightGray),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_ios, color: lightGray, size: 21,),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -101,18 +128,18 @@ class _ProfileSetupStep4State extends State<ProfileSetupStep4> {
             padding: const EdgeInsets.only(top: 20.0, bottom: 10.0),
             child: Column(
               children: const [
-                Text(
-                  "Let's select your interests.",
-                  style: TextStyle(
-                    fontFamily: 'Karla',
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
+                 Text(
+                    'Step 4: Select your interests.',
+                    style: TextStyle(
+                      fontFamily: 'Karla',
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: lightGray,
+                    ),
+              ),
                 SizedBox(height: 5),
                 Text(
-                  "Please select 3 - 6 to proceed.",
+                  "Please select min. of 3 and max. of 6 to proceed.",
                   style: TextStyle(
                     fontFamily: 'Karla',
                     fontSize: 14,
@@ -130,6 +157,10 @@ class _ProfileSetupStep4State extends State<ProfileSetupStep4> {
                 runSpacing: 8,
                 children: _interests.map((interest) {
                   return ChoiceChip(
+                    avatar: Icon(
+                      interestIcons[interest],
+                      color: _selectedInterests.contains(interest) ? Colors.white : lightGray,
+                    ),
                     label: Text(interest),
                     selected: _selectedInterests.contains(interest),
                     onSelected: (isSelected) {
@@ -141,14 +172,15 @@ class _ProfileSetupStep4State extends State<ProfileSetupStep4> {
                         }
                       });
                     },
-                    selectedColor: const Color(0xFF911240),
-                    backgroundColor: Colors.grey[200],
+                    selectedColor: vividYellow,
+                    backgroundColor: offBlack,
                     labelStyle: TextStyle(
                       fontFamily: 'Karla',
                       color: _selectedInterests.contains(interest)
-                          ? Colors.white
-                          : Colors.black,
+                          ? offBlack
+                          : lightGray,
                     ),
+                    side: BorderSide.none,
                   );
                 }).toList(),
               ),
@@ -158,7 +190,7 @@ class _ProfileSetupStep4State extends State<ProfileSetupStep4> {
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF911240),
+                backgroundColor: vividYellow,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -170,7 +202,7 @@ class _ProfileSetupStep4State extends State<ProfileSetupStep4> {
                 'Continue',
                 style: TextStyle(
                   fontFamily: 'Karla',
-                  color: Colors.white,
+                  color: darkCharcoal,
                   fontWeight: FontWeight.bold,
                 ),
               ),

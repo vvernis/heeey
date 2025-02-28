@@ -3,6 +3,11 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'profile_setup3_screen.dart';
 
+const Color darkCharcoal = Color(0xFF29292B);
+const Color offBlack = Color(0xFF343436);
+const Color vividYellow = Color(0xFFd7ed73);
+const Color lightGray = Color(0xFFF0F0E6);
+
 class ProfileSetupStep2 extends StatefulWidget {
   final String uid;
   final String aboutMe;
@@ -137,12 +142,13 @@ class _ProfileSetupStep2State extends State<ProfileSetupStep2> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('What is your MBTI?'),
-        backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(color: Colors.black),
+        title: const Text('Profile Creation'),
+        backgroundColor: darkCharcoal,
+        iconTheme: const IconThemeData(color: lightGray),
+        titleTextStyle: TextStyle(fontFamily: 'Karla', fontSize: 17, fontWeight: FontWeight.bold, color: lightGray),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_ios, color: lightGray, size: 21,),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -151,15 +157,25 @@ class _ProfileSetupStep2State extends State<ProfileSetupStep2> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            Text(
+              'Step 2: What is your MBTI?',
+              style: const TextStyle(
+                fontFamily: 'Karla',
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: lightGray,
+              ),
+        ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
               child: _buildInputContainer(
                 child: DropdownButtonFormField<String>(
+                  dropdownColor: offBlack,
                   decoration: const InputDecoration(
                     labelText: 'Select Your MBTI',
                     labelStyle: TextStyle(
                       fontFamily: 'Karla',
-                      color: Color(0xFF911240),
+                      color: lightGray,
                       fontWeight: FontWeight.bold,
                       fontSize: 14
                     ),
@@ -171,7 +187,7 @@ class _ProfileSetupStep2State extends State<ProfileSetupStep2> {
                       value: mbti,
                       child: Text(
                         mbti,
-                        style: const TextStyle(fontFamily: 'Karla', fontSize: 14),
+                        style: const TextStyle(fontFamily: 'Karla', fontSize: 14, color: lightGray),
                       ),
                     );
                   }).toList(),
@@ -192,8 +208,8 @@ class _ProfileSetupStep2State extends State<ProfileSetupStep2> {
                   children: [
                     Image.asset(mbtiImage!),
                     if (mbtiDescription != null)
-                      Text(mbtiDescription!, textAlign: TextAlign.center, style: const TextStyle(fontFamily: 'Karla')),
-                      Text('(Taken from 16personalities.com)', style: const TextStyle(fontFamily: 'Karla', fontSize: 10, fontStyle: FontStyle.italic)),
+                      Text(mbtiDescription!, textAlign: TextAlign.center, style: const TextStyle(fontFamily: 'Karla', color: lightGray)),
+                      Text('(Taken from 16personalities.com)', style: const TextStyle(fontFamily: 'Karla', fontSize: 10, fontStyle: FontStyle.italic, color: lightGray)),
                   ],
                 ),
               ),
@@ -201,7 +217,7 @@ class _ProfileSetupStep2State extends State<ProfileSetupStep2> {
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF911240),
+                  backgroundColor: vividYellow,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -213,7 +229,7 @@ class _ProfileSetupStep2State extends State<ProfileSetupStep2> {
                   'Next',
                   style: TextStyle(
                     fontFamily: 'Karla',
-                    color: Colors.white,
+                    color: offBlack,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -229,16 +245,16 @@ class _ProfileSetupStep2State extends State<ProfileSetupStep2> {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: offBlack,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            blurRadius: 10,
-            spreadRadius: 2,
-            offset: const Offset(0, 4),
-          ),
-        ],
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.5),
+                        spreadRadius: 1,
+                        blurRadius: 3,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
       ),
       child: child,
     );

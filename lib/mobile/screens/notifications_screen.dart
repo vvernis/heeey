@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
+
+const Color darkCharcoal = Color(0xFF29292B);
+const Color offBlack = Color(0xFF343436);
+const Color vividYellow = Color(0xFFd7ed73);
+const Color lightGray = Color(0xFFF0F0E6);
 
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
 
   Future<void> markAsRead(String notificationId) async {
     try {
-      print('Marking Notification as Read: $notificationId');
       await FirebaseFirestore.instance
           .collection('notifications')
           .doc(notificationId)
@@ -21,106 +26,89 @@ class NotificationsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentUserId = FirebaseAuth.instance.currentUser?.uid;
 
-    print('Current User ID: $currentUserId'); // Debug
-
-    if (currentUserId == null) {
-      return const Scaffold(
-        body: Center(
-          child: Text('You need to be logged in to view notifications.'),
-        ),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Notifications',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: Colors.black,
+         title: Text('Notifications'),
+        backgroundColor: darkCharcoal,
+        titleTextStyle: TextStyle(fontSize: 17, fontFamily: 'Karla', fontWeight: FontWeight.bold),
+        iconTheme: const IconThemeData(color: lightGray),
         automaticallyImplyLeading: false,
+        elevation: 0,
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('notifications')
-            .where('receiverId', isEqualTo: currentUserId)
-            .orderBy('timestamp', descending: true)
-            .snapshots(),
-        builder: (context, snapshot) {
-          print('Snapshot ConnectionState: ${snapshot.connectionState}');
-          print('Snapshot Has Data: ${snapshot.hasData}');
-          print('Snapshot Error: ${snapshot.error}');
+      body: currentUserId == null
+        ? Center(child: Text('You need to be logged in to view notifications.'))
+        : StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('notifications')
+                .where('receiverId', isEqualTo: currentUserId)
+                .orderBy('timestamp', descending: true)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasError) {
+                return Center(child: Text('Error fetching notifications.'));
+              }
+              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                return Center(child: Text('No notifications available.'));
+              }
 
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
+              var responses = snapshot.data!.docs.where((doc) => doc['type'] == 'newMessage').toList();
+              var requests = snapshot.data!.docs.where((doc) => doc['type'] == 'matchRequest').toList();
+              var challengeCompleted = snapshot.data!.docs.where((doc) => doc['type'] == 'challengeCompleted').toList();
 
-          final notifications = snapshot.data!.docs;
-
-          if (notifications.isEmpty) {
-            return const Center(
-              child: Text(
-                'No notifications available.',
-                style: TextStyle(fontSize: 16),
-              ),
-            );
-          }
-
-          return ListView.builder(
-            itemCount: notifications.length,
-            itemBuilder: (context, index) {
-              final notification = notifications[index];
-              final String message = notification['message'] ?? 'No message';
-              final bool isRead = notification['isRead'] ?? false;
-              final Timestamp timestamp = notification['timestamp'] as Timestamp;
-              final DateTime notificationDate = timestamp.toDate();
-
-              return Card(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 8.0,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16.0),
-                ),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: isRead ? Colors.grey[300] : Colors.blue,
-                    child: const Icon(Icons.notifications, color: Colors.white),
-                  ),
-                  title: Text(
-                    message,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: isRead ? FontWeight.normal : FontWeight.bold,
-                    ),
-                  ),
-                  subtitle: Text(
-                    '${notificationDate.toLocal()}'.split(' ')[0],
-                    style: const TextStyle(fontSize: 14, color: Colors.grey),
-                  ),
-                  trailing: isRead
-                      ? null
-                      : ElevatedButton(
-                          onPressed: () {
-                            markAsRead(notification.id);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.0),
-                            ),
-                          ),
-                          child: const Text('Mark as Read'),
-                        ),
-                ),
+              return ListView(
+                children: [
+                  buildNotificationSection('Responses', responses),
+                  buildNotificationSection('Requests', requests),
+                  buildNotificationSection('Announcements', challengeCompleted),
+                ]
               );
             },
-          );
-        },
-      ),
+          ),
     );
   }
+
+ Widget buildNotificationSection(String title, List<QueryDocumentSnapshot> notifications) {
+  return ExpansionTile(
+    title: Text(
+      title,
+      style: const TextStyle(
+        fontSize: 15, 
+        fontWeight: FontWeight.bold, 
+        color: Colors.white,
+      ),
+    ),
+    collapsedIconColor: Colors.white,
+    iconColor: vividYellow,
+    children: notifications.map((notification) {
+      bool isRead = notification['isRead'] as bool? ?? false;
+      return Container(
+        decoration: BoxDecoration(
+          color: isRead ? Colors.grey[850] : Colors.grey[900],
+          borderRadius: BorderRadius.circular(10),
+          border: isRead ? null : Border.all(color: vividYellow, width: 2),
+        ),
+        margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16),
+        child: ListTile(
+          title: Text(
+            notification['message'] ?? 'No message',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: isRead ? FontWeight.normal : FontWeight.bold,
+            ),
+          ),
+          subtitle: Text(
+            DateFormat('dd MMM yyyy')
+                .format((notification['timestamp'] as Timestamp).toDate()),
+            style: TextStyle(color: Colors.grey[500]),
+          ),
+          onTap: () => !isRead ? markAsRead(notification.id) : null,
+        ),
+      );
+    }).toList(),
+  );
+}
+
 }

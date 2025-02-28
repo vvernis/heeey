@@ -1,0 +1,92 @@
+Test Case ID,Area / Feature,Description,Steps,Expected Outcome,Pass/Fail
+MOB-AUTH-01,Authentication – Login (Email),"User logs in with a valid email and password.","1. Launch the mobile app.
+2. Enter a registered email (e.g., john@example.com) and correct password.
+3. Tap “Sign in”.","User successfully logs in and is redirected to the home screen.",Not Tested
+MOB-AUTH-02,Authentication – Login (Username),"User logs in using a username extracted from their email (e.g., 'john' for john@example.com).","1. Launch the mobile app.
+2. Enter the username (e.g., “john”) and correct password.
+3. Tap “Sign in”.","The app extracts the full email (via Firestore lookup) and logs the user in successfully.",Not Tested
+MOB-AUTH-03,Authentication – Login (Invalid),"Attempt login with an unregistered email/username or incorrect password.","1. Launch the app.
+2. Enter invalid credentials.
+3. Tap “Sign in”.","An error message is displayed and the user remains on the login screen.",Not Tested
+MOB-AUTH-04,Authentication – Forgot Password (Success),"Send a password reset email to a valid registered email.","1. Tap “Forgot Password”.
+2. Enter a registered email.
+3. Tap “Send Reset Email”.","A confirmation message is displayed and the user receives a password reset email.",Not Tested
+MOB-AUTH-05,Authentication – Forgot Password (Fail),"Attempt to send a password reset email for an unregistered email.","1. Tap “Forgot Password”.
+2. Enter an unregistered email.
+3. Tap “Send Reset Email”.","An error message is displayed informing the user that the email is not found.",Not Tested
+MOB-PROFILE-01,Profile – Load Profile,"Load and display the user profile (name, about, course, profile picture).","1. Navigate to the Profile screen.
+2. Verify that the profile picture, name, about me, and course are correctly loaded from Firestore.","Profile details appear as stored in Firestore.",Not Tested
+MOB-PROFILE-02,Profile – Edit Profile,"Edit allowed profile fields (name, about, course) while the email remains locked.","1. Open the profile edit modal.
+2. Modify name, about, and course fields.
+3. Verify that the email field is not editable.
+4. Tap “Update”.","Changes are saved and immediately reflected on the Profile screen; the email remains unchanged.",Not Tested
+MOB-PROFILE-03,Profile – Update Password,"Update the user password ensuring it meets regex rules.","1. Navigate to the password update screen.
+2. Enter a new password and confirmation (both must match and satisfy the regex).
+3. Tap “Update Password”.","Password is updated in Firebase Auth and a confirmation message is shown.",Not Tested
+MOB-CHALLENGE-01,Challenge Details – Load,"Load and display challenge details (title, images, period, description, mode, type).","1. Tap on a challenge card from the home screen.
+2. Verify that the challenge details (main image, additional images, title, period, description, pills) are displayed correctly.","Challenge details load properly with correctly decoded images and formatted dates.",Not Tested
+MOB-CHALLENGE-02,Challenge Join – Create Record,"Join a challenge and verify that a join record is created and the participant count is incremented.","1. Tap on a challenge card.
+2. Tap “Join”.
+3. Check Firestore for a new document in joined_challenges and an incremented participant count in the challenge document.","Join record is created and participant count is updated in Firestore.",Not Tested
+MOB-SUBMISSION-01,Submission – File (Small Image),"Submit an image below the maximum file size (no compression needed).","1. Open the submission screen for a challenge.
+2. Pick an image file below 500KB.
+3. Tap “Submit”.
+4. Verify that a new submission document with “pending” status is created in Firestore.","Image is submitted successfully and stored with “pending” status.",Not Tested
+MOB-SUBMISSION-02,Submission – File (Large Image),"Submit an image above the maximum file size and verify it is compressed before submission.","1. Open the submission screen.
+2. Pick an image file larger than 500KB.
+3. Tap “Submit”.
+4. Check that the image is compressed and stored with “pending” status in Firestore.","Image is compressed and then successfully submitted with “pending” status.",Not Tested
+MOB-SUBMISSION-03,Submission – Permission Toggle,"Verify that the submission preview modal allows toggling permission for image voting.","1. Open the submission preview modal.
+2. Toggle the voting permission option.
+3. Tap “Submit”.
+4. Verify that the submission document in Firestore includes the correct allowVoting field.","The submission document in Firestore includes the correct voting permission setting.",Not Tested
+MOB-NOTIF-01,Notifications – Receive,"Receive notifications for new messages, match requests, and announcements.","1. Trigger events that generate notifications (e.g., send a message, match request, challenge completion).
+2. Open the Notifications screen.","Notifications appear under the appropriate sections, sorted by timestamp.",Not Tested
+MOB-NOTIF-02,Notifications – Mark as Read,"Mark a notification as read.","1. Tap an unread notification on the Notifications screen.
+2. Verify that the isRead flag is updated in Firestore and the visual style changes accordingly.","Notification is marked as read and its style is updated.",Not Tested
+MOB-MATCH-01,Matching – Filter & Sort,"Filter and sort potential matches based on activity and date.","1. Apply filters for activity and date on the matching screen.
+2. Verify that only matching submissions are displayed.","Matching submissions are correctly filtered and sorted.",Not Tested
+MOB-GROUPCHAT-01,Group Chat – Messaging,"Send and receive messages in a group chat.","1. Open the group chat for a joined challenge.
+2. Send a message.
+3. Verify that the message appears in the chat and notifications are sent to other members.","Message appears in real time and notifications are triggered.",Not Tested
+MOB-MAP-01,Memory Gallery Map – Markers,"Display markers on the map for submissions with valid locations and participant counts.","1. Open the Memory Gallery screen.
+2. Verify that markers appear where submissions have a valid location.
+3. Tap a marker and verify it shows the correct participant count and image preview.","Markers display correctly with decoded images and participant counts; tapping a marker navigates to the detail page.",Not Tested
+MOB-MAP-02,Memory Gallery Map – Reverse Geocode,"Use reverse geocoding to display the correct place name for a marker.","1. Tap a marker with known coordinates.
+2. Verify that the location detail page shows the correct place name (e.g., “Harbourfront”).","The correct place name is displayed based on reverse geocoding.",Not Tested
+ADMIN-USER-01,Admin – Login (Web),"Admin logs in to the management dashboard using valid credentials.","1. Navigate to the Admin Management website.
+2. Enter valid admin credentials.
+3. Click “Log in”.","Admin dashboard loads with full access to user management functions.",Not Tested
+ADMIN-USER-02,Admin – User List & Search,"Admin dashboard displays a list of users with working search, filters, and pagination.","1. Open the admin dashboard.
+2. Use the search box to filter users by name or email.
+3. Apply role filters.
+4. Navigate through pages.","User list updates dynamically based on search, filters, and pagination.",Not Tested
+ADMIN-USER-03,Admin – Create User,"Create a new user via the admin dashboard; temporary password should only be used for Auth.","1. Open the “Add User” modal.
+2. Enter valid details (name, email, temporary password, course, start year, grad year).
+3. Tap “Create”.
+4. Verify that the user is created in Firebase Auth and Firestore, and the temporary password is not stored in plaintext.","New user is created; the temporary password is used only in Firebase Auth and is not stored in Firestore.",Not Tested
+ADMIN-USER-04,Admin – Edit User,"Edit an existing user’s details via the admin dashboard; email field is locked.","1. Open the edit modal for a user.
+2. Modify allowed fields (name, course, years).
+3. Verify that the email field is non-editable.
+4. Tap “Update”.
+5. Verify that the changes are saved to Firestore.","User details update successfully and the email field remains locked.",Not Tested
+ADMIN-USER-05,Admin – Import Users,"Import multiple users from an Excel file with valid and invalid records.","1. Click “Import Excel” on the admin dashboard.
+2. Select a valid Excel file.
+3. Verify the summary showing the number of users created versus invalid records.
+4. Check that duplicate or invalid entries are not imported.","Valid users are created in Firebase Auth and Firestore; a summary is displayed.",Not Tested
+ADMIN-USER-06,Admin – Delete User (Simulated),"Simulate deletion of a user on the Spark plan by notifying the admin.","1. Select one or more users in the admin dashboard.
+2. Click “Delete Selected”.
+3. Instead of direct deletion, display a message instructing manual deletion (or send an email to admin).","A message is displayed (or an email is sent) instructing the admin to manually delete the selected users.",Not Tested
+ADMIN-USER-07,Admin – Change Permissions,"Change a user’s role (e.g., from “user” to “admin”) via the admin dashboard.","1. Open the edit modal for a user.
+2. Change the role from “user” to “admin”.
+3. Tap “Save”.
+4. Verify that the user’s document in Firestore reflects the new role.","User’s role is updated correctly in Firestore.",Not Tested
+ADMIN-USER-08,Admin – Email Field Lock,"Verify that the email field in the edit modal is non-editable.","1. Open the edit modal for a user.
+2. Attempt to edit the email field.
+3. Verify that the field is locked or read-only.","Email field is locked and cannot be modified.",Not Tested
+SECURITY-01,Security – Unauthenticated Access,"Ensure secured pages are inaccessible without login.","1. Attempt to navigate to a secured page (e.g., profile, chat) without being logged in.
+2. Verify redirection to the login screen.","User is redirected to the login screen and access is denied.",Not Tested
+SECURITY-02,Security – Firestore Rules,"Verify that protected fields cannot be updated directly from the client.","1. Attempt to update protected fields (e.g., password) via direct Firestore writes.
+2. Observe the result.","Updates are rejected by Firestore security rules.",Not Tested
+SECURITY-03,Security – Data Exposure,"Ensure sensitive data (e.g., plaintext passwords) is not stored in Firestore.","1. Create or update a user via the admin dashboard.
+2. Inspect the Firestore document for that user.","Sensitive data is not stored in plaintext in Firestore.",Not Tested

@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:heeey/mobile/screens/challenges/challenges_screen.dart';
 import 'joined_challenges.dart';
 
+const Color darkCharcoal = Color(0xFF29292B);
+const Color offBlack = Color(0xFF343436);
+const Color vividYellow = Color(0xFFd7ed73);
+const Color lightGray = Color(0xFFF0F0E6);
 
 class ChallengeHomeScreen extends StatelessWidget {
   const ChallengeHomeScreen({super.key});
@@ -12,46 +16,32 @@ class ChallengeHomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'Challenges',
-          style: TextStyle(fontFamily: 'Karla', color: Colors.black),
+          style: TextStyle(fontFamily: 'Karla', color: lightGray, fontSize: 17, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(color: Colors.black),
+        backgroundColor: darkCharcoal,
+        iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_ios, color: lightGray, size: 21,),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
       ),
+      backgroundColor: darkCharcoal, // Set the background color to black
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+         // mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Welcome to the Challenge System',
-              style: TextStyle(
-                fontFamily: 'Karla', 
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
             const SizedBox(height: 8),
-            const Text(
-              'Find and manage your challenges using the options below.',
-              style: TextStyle(fontFamily: 'Karla', fontSize: 14, color: Colors.grey),
-            ),
-            const SizedBox(height: 32),
             _buildOptionButton(
               context: context,
               title: 'Joined Challenges',
-              subtitle: 'View challenges you are part of.',
-              icon: Icons.event,
-              backgroundColor: const Color(0xFFEDE7FF),
-              iconColor: const Color(0xFF8A56AC),
+              subtitle: 'View challenges you are part of',
+              imagePath: 'lib/mobile/assets/images/joined.png', // Path to your image
               onTap: () {
                 Navigator.push(
                     context,
@@ -61,14 +51,14 @@ class ChallengeHomeScreen extends StatelessWidget {
                   );
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 40),
             _buildOptionButton(
               context: context,
+              
               title: 'Available Challenges',
-              subtitle: 'Explore new challenges to join.',
-              icon: Icons.explore,
-              backgroundColor: const Color(0xFFFFF3E7),
-              iconColor: const Color(0xFFF57C00),
+              subtitle: 'Explore new challenges to join',
+              imagePath: 'lib/mobile/assets/images/avail.png', // Path to your image
+              
               onTap: () {
                  Navigator.push(
                     context,
@@ -88,73 +78,58 @@ class ChallengeHomeScreen extends StatelessWidget {
     required BuildContext context,
     required String title,
     required String subtitle,
-    required IconData icon,
-    required Color backgroundColor,
-    required Color iconColor,
+    required String imagePath,
     required VoidCallback onTap,
   }) {
+    List<String> words = title.split(' ');
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        width: double.infinity,
+        height: 175,
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(12),
+          color: offBlack,
+          borderRadius: BorderRadius.circular(20),
+          image: DecorationImage(
+            image: AssetImage(imagePath),
+            fit: BoxFit.contain,
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
+              color: Colors.black.withOpacity(0.5),
+              spreadRadius: 0,
               blurRadius: 10,
-              offset: const Offset(0, 4),
+              offset: Offset(0, 5), // Changes position of shadow
             ),
           ],
         ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(50),
-              ),
-              child: Icon(
-                icon,
-                color: iconColor,
-                size: 28,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontFamily: 'Karla', 
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(
-                      fontFamily: 'Karla', 
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.grey,
-              size: 16,
-            ),
-          ],
-        ),
+        child: Padding( // Wrap RichText in Padding
+        padding: const EdgeInsets.only(top: 7),
+       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+        Text(
+          title,
+          style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: lightGray,
+                  fontFamily: 'Karla',
+          )
+          ),
+        Text(
+          subtitle,
+          style: TextStyle(
+                    fontFamily: 'Karla',
+                    fontSize: 12,
+                    //fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(255, 195, 193, 193),
+                )
+                )
+        ]
+       )
+      ),
       ),
     );
   }

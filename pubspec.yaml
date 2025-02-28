@@ -30,6 +30,21 @@ environment:
 dependencies:
   flutter:
     sdk: flutter 
+    
+  badges: ^3.1.2
+  file_picker: ^8.3.3
+  excel: ^4.0.6  
+
+  
+  geolocator: ^13.0.2
+  
+  flutter_map: ^7.0.2
+  flutter_map_marker_cluster: ^1.4.0
+  latlong2: ^0.9.0  
+  flutter_map_cancellable_tile_provider: any
+  geocoding: any
+  
+  
   firebase_core: ^3.8.1
   firebase_storage: ^12.3.7
   firebase_auth: any
@@ -70,13 +85,16 @@ dependencies:
   url_launcher_web: ^2.4.0
   url_launcher_windows: ^3.1.4
 
-  excel: ^4.0.6
+  
 
 
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+
+
+
 
 dev_dependencies:
   flutter_test:
@@ -103,9 +121,17 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - lib/mobile/assets/images/LOGO.png
-    - lib/mobile/assets/images/LOGOappbar.png
+    - lib/mobile/assets/images/avail.png
+    - lib/mobile/assets/images/joined.png
     - lib/mobile/assets/images/fallback.png
     - lib/mobile/assets/images/mbti/
+    - lib/mobile/assets/images/Design.png
+    - lib/mobile/assets/images/onboarding1.png
+    - lib/mobile/assets/images/onboarding2.png
+    - lib/mobile/assets/images/onboarding3.png
+    - lib/web/assets/images/LOGO.png
+    - lib/web/assets/images/cover.png
+
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
