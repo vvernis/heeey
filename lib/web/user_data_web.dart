@@ -1343,7 +1343,13 @@ Widget _editFieldWithValidation(String label, TextEditingController c, bool obsc
       int createdCount = 0, invalidCount = 0;
       for (int i = 1; i < (sheet?.rows.length ?? 0); i++) {
         final row = sheet!.rows[i];
-        if (row.isEmpty) continue;
+
+        // Check if all cells are null or empty
+        bool isRowEmpty = row.every((cell) => cell == null || cell.value == null || cell.value.toString().trim().isEmpty);
+        if (isRowEmpty) {
+          continue; // Skip this row without incrementing invalidCount
+        }
+   
         final name  = row[0]?.value?.toString() ?? '';
         final email = row.length > 1 ? row[1]?.value?.toString() ?? '' : '';
         final pass  = row.length > 2 ? row[2]?.value?.toString() ?? '' : '';
