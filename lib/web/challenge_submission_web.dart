@@ -532,7 +532,7 @@ void _showEnlargedImage(BuildContext context, Uint8List imageBytes) {
     batch.update(groupRef, {
       'status': 'approved',
       'approvedAt': Timestamp.now(),
-      'likes': 0
+      'likes': 0,
     });
 
     if (members.isNotEmpty) {
@@ -547,7 +547,12 @@ void _showEnlargedImage(BuildContext context, Uint8List imageBytes) {
       }
     }
 
-    await batch.commit();
+    try {
+      await batch.commit();
+      print('Update committed successfully.');
+    } catch (e) {
+      print('Error committing batch update: $e');
+    }
 
     // Automatically send notifications for this approved group.
     await _sendApprovalNotificationForGroup(groupDoc);
