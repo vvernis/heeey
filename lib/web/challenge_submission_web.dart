@@ -529,11 +529,12 @@ void _showEnlargedImage(BuildContext context, Uint8List imageBytes) {
     DocumentReference groupRef =
         FirebaseFirestore.instance.collection('groups').doc(groupDoc.id);
 
-    batch.update(groupRef, {
+    batch.set(groupRef, {
       'status': 'approved',
       'approvedAt': Timestamp.now(),
       'likes': 0,
-    });
+    }, SetOptions(merge: true));
+
 
     if (members.isNotEmpty) {
       QuerySnapshot submissionSnapshot = await FirebaseFirestore.instance
