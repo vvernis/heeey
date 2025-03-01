@@ -532,6 +532,7 @@ void _showEnlargedImage(BuildContext context, Uint8List imageBytes) {
     batch.update(groupRef, {
       'status': 'approved',
       'approvedAt': Timestamp.now(),
+      'likes': 0
     });
 
     if (members.isNotEmpty) {
