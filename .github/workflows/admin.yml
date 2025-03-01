@@ -22,6 +22,11 @@ jobs:
         with:
           channel: 'stable'
 
+      - name: Verify Flutter installation
+        run: |
+          flutter --version
+          which flutter
+
       - name: Install dependencies
         run: flutter pub get
 
