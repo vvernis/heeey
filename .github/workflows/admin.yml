@@ -30,6 +30,13 @@ jobs:
           flutter --version
           which flutter
 
+      - name: Debug environment
+        run: |
+          echo "PATH is: $PATH"
+          flutter --version
+          which flutter
+        
+
       - name: Install dependencies
         run: flutter pub get
 
