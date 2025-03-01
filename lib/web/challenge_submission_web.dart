@@ -535,13 +535,6 @@ void _showEnlargedImage(BuildContext context, Uint8List imageBytes) {
       'likes': 0,
     });
 
-    // Print the batch update data before committing
-    print("Batch Update Data: ${{
-      'status': 'approved',
-      'approvedAt': Timestamp.now(),
-      'likes': 0,
-    }}");
-
     if (members.isNotEmpty) {
       QuerySnapshot submissionSnapshot = await FirebaseFirestore.instance
           .collection('user_submissions')
