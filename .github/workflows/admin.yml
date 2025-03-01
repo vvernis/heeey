@@ -4,11 +4,14 @@ on:
   push:
     paths:
       - 'web/**'
+      - 'lib/**'
       - '!mobile/**'
   pull_request:
     paths:
       - 'web/**'
+      - 'lib/**'
       - '!mobile/**'
+
 
 jobs:
   build-and-deploy:
