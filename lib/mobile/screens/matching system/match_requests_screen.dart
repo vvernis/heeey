@@ -94,7 +94,7 @@ class _MatchRequestsScreenState extends State<MatchRequestsScreen> {
                     isViewingSentRequests = false;
                   });
                 },
-                child: const Text('Received Requests'),
+                child: const Text('Received Requests', style: TextStyle(fontSize: 12),),
               ),
             ),
             // Sent Requests
@@ -117,7 +117,7 @@ class _MatchRequestsScreenState extends State<MatchRequestsScreen> {
                     isViewingSentRequests = true;
                   });
                 },
-                child: const Text('Sent Requests'),
+                child: const Text('Sent Requests', style: TextStyle(fontSize: 12),),
               ),
             ),
           ],
@@ -358,13 +358,30 @@ class _MatchRequestsScreenState extends State<MatchRequestsScreen> {
                                               children: [
                                                 // Accept icon button
                                                 ElevatedButton(
-                                                  onPressed: () {
-                                                    FirebaseFirestore.instance
+                                                  onPressed: () async {
+                                                   await FirebaseFirestore.instance
                                                         .collection(
                                                             'matchRequests')
                                                         .doc(matchRequest.id)
                                                         .update({
                                                       'status': 'accepted'
+                                                    });
+
+                                                    // Fetch the current user's name from Firestore
+                                                    final currentUserSnapshot = await FirebaseFirestore.instance
+                                                        .collection('users')
+                                                        .doc(currentUserId)
+                                                        .get();
+                                                    final currentUserName = currentUserSnapshot.data()?['name'] ?? 'Someone';
+
+                                                     // Send notification to the sender of the match request
+                                                    await FirebaseFirestore.instance.collection('notifications').add({
+                                                      'isRead': false,
+                                                      'message': 'Your match request has been accepted from $currentUserName!',
+                                                      'receiverId': matchRequest['senderId'], // sender gets the notification
+                                                      'senderId': currentUserId, // current user (receiver) is the sender of the notification
+                                                      'timestamp': FieldValue.serverTimestamp(),
+                                                      'type': 'matchRequest',
                                                     });
 
                                                     ScaffoldMessenger.of(
@@ -395,16 +412,34 @@ class _MatchRequestsScreenState extends State<MatchRequestsScreen> {
                                                     size: 13,
                                                   ),
                                                 ),
-                                                const SizedBox(width: 8),
+                                                const SizedBox(width: 5),
                                                 // Reject icon button
                                                 ElevatedButton(
-                                                  onPressed: () {
-                                                    FirebaseFirestore.instance
+                                                  onPressed: () async{
+                                                    await FirebaseFirestore.instance
                                                         .collection(
                                                             'matchRequests')
                                                         .doc(matchRequest.id)
                                                         .update({
                                                       'status': 'rejected'
+                                                    });
+
+                                                    // Fetch the current user's name from Firestore
+                                                    final currentUserSnapshot = await FirebaseFirestore.instance
+                                                        .collection('users')
+                                                        .doc(currentUserId)
+                                                        .get();
+                                                    final currentUserName = currentUserSnapshot.data()?['name'] ?? 'Someone';
+
+
+                                                    // Send notification to the sender of the match request
+                                                    await FirebaseFirestore.instance.collection('notifications').add({
+                                                      'isRead': false,
+                                                      'message': 'Your match request has been rejected from $currentUserName.',
+                                                      'receiverId': matchRequest['senderId'], // sender gets the notification
+                                                      'senderId': currentUserId, // current user (receiver) is the sender of the notification
+                                                      'timestamp': FieldValue.serverTimestamp(),
+                                                      'type': 'matchRequest',
                                                     });
 
                                                     ScaffoldMessenger.of(
@@ -419,6 +454,7 @@ class _MatchRequestsScreenState extends State<MatchRequestsScreen> {
                                                   },
                                                   style:
                                                       ElevatedButton.styleFrom(
+                                                         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4), 
                                                     backgroundColor:
                                                         darkCharcoal
                                                             .withOpacity(0.2),
@@ -441,7 +477,7 @@ class _MatchRequestsScreenState extends State<MatchRequestsScreen> {
                                         ],
                                       ),
                                     ),
-                                    const SizedBox(width: 8),
+                                   // const SizedBox(width: 2),
 
                                     // Right column for status & Chat
                                     // Center them vertically

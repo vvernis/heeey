@@ -86,8 +86,9 @@ class _VerificationWidgetState extends State<VerificationWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: darkCharcoal,
-      body: Padding(
-        padding: const EdgeInsets.all(26.0),
+       body: SafeArea(
+        child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 26.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -219,6 +220,7 @@ class _VerificationWidgetState extends State<VerificationWidget> {
           ],
         ),
       ),
+       ),
     );
   }
 }

@@ -121,7 +121,10 @@ class _ChallengesScreenState extends State<ChallengesScreen> {
     return Container(
       color: darkCharcoal,
       padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
+      child: SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: 
+      Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const SizedBox(width: 5),
@@ -134,6 +137,7 @@ class _ChallengesScreenState extends State<ChallengesScreen> {
           _buildSingleFilterChip(ChallengeFilter.past),
           const SizedBox(width: 5),
         ],
+      ),
       ),
     );
   }
@@ -384,14 +388,17 @@ class _ChallengesScreenState extends State<ChallengesScreen> {
                         ),
                         const SizedBox(height: 8),
                         // About text, 2 lines max.
-                        Text(
-                          about,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontFamily: 'Karla',
-                            fontSize: 10,
-                            color: Colors.grey,
+                        Padding(
+                          padding: const EdgeInsets.only(right: 30), // Adjust the value as needed
+                          child: Text(
+                            about,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontFamily: 'Karla',
+                              fontSize: 10,
+                              color: Colors.grey,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 8),

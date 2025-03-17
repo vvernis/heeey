@@ -52,9 +52,11 @@ class _SignUpWidgetState extends State<SignUpWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+     //resizeToAvoidBottomInset: true,
       backgroundColor: darkCharcoal,
-      body: Padding(
-        padding: const EdgeInsets.all(26.0),
+      body: SafeArea(
+        child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 26.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -171,6 +173,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

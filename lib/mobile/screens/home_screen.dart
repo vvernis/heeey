@@ -186,7 +186,30 @@ class _HomeScreenState extends State<HomeScreen> {
     ); 
   }
 
+  Stream<int> getNotificationCount(String userId) {
+  return FirebaseFirestore.instance
+      .collection('notifications')
+      .where('receiverId', isEqualTo: userId)
+      .where('isRead', isEqualTo: false)
+      .snapshots()
+      .map((snapshot) => snapshot.docs.length);
+      
+}
+
   Widget _customNavBar() {
+    final user = FirebaseAuth.instance.currentUser;
+  final userId = user?.uid;
+
+  // If userId is null, we return a Stream that always emits 0,
+  // so we don't crash or have to create a separate widget.
+  return StreamBuilder<int>(
+    stream: userId == null
+      ? Stream.value(0) // fallback: always 0 notifications
+      : getNotificationCount(userId), // your actual function
+    builder: (context, snapshot) {
+      // If the stream hasn’t emitted yet, default to 0
+      final notificationCount = snapshot.data ?? 0;
+
   return Container(
     padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom, left: 30, right: 30),
     decoration: BoxDecoration(
@@ -210,7 +233,12 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
               _navBarItem(icon: Icons.home, label: 'Home', index: 0),
-              _navBarItem(icon: Icons.notifications, label: 'Notifications', index: 1),
+              _navBarItem(
+                    icon: Icons.notifications,
+                    label: 'Notification',
+                    index: 1,
+                    badgeCount: notificationCount,
+                  ),
               _navBarItem(icon: Icons.chat, label: 'Chats', index: 2),
               _navBarItem(icon: Icons.person, label: 'Profile', index: 3),
             ],
@@ -219,35 +247,78 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     ),
   );
+    }
+    );
 }
 
 
 
-Widget _navBarItem({required IconData icon, required String label, required int index}) {
+Widget _navBarItem({
+  required IconData icon,
+  required String label,
+  required int index,
+  int badgeCount = 0, // default to 0
+}) {
   bool isSelected = _currentIndex == index;
   return GestureDetector(
     onTap: () => setState(() {
       _currentIndex = index;
     }),
     child: AnimatedContainer(
-      duration: Duration(milliseconds: 250),
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      duration: const Duration(milliseconds: 250),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: isSelected ? Colors.white : Colors.transparent,
         borderRadius: BorderRadius.circular(25),
       ),
       child: Row(
         children: [
-          Icon(icon, color: isSelected ? offBlack : Colors.white),
-          if (isSelected) Padding(
-            padding: EdgeInsets.only(left: 8),
-            child: Text(label, style: TextStyle(color: offBlack)),
-          )
+          // Wrap the icon in a stack to show a badge
+          Stack(
+            clipBehavior: Clip.none, // so badge can overflow outside the icon
+            children: [
+              Icon(
+                icon,
+                color: isSelected ? offBlack : Colors.white,
+              ),
+              if (badgeCount > 0) // only show badge if there's something to show
+                Positioned(
+                  // position the badge in the top-right corner of the icon
+                  right: -4,
+                  top: -4,
+                  child: Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 16,
+                      minHeight: 16,
+                    ),
+                    child: Text(
+                      '$badgeCount',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          if (isSelected)
+            Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: Text(label, style: TextStyle(color: offBlack)),
+            )
         ],
       ),
     ),
   );
 }
+
 
   Widget _buildMainContent() {
     return SingleChildScrollView(

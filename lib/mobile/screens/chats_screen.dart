@@ -161,10 +161,17 @@ class _ChatsScreenState extends State<ChatsScreen> {
                     lastMessage,
                     style: const TextStyle(color: Colors.white70),
                   ),
-                  trailing: Text(
-                    dateText,
-                    style: const TextStyle(color: Colors.grey, fontSize: 12),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        dateText,
+                        style: const TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
+                      _buildUnreadBadge(chat.id), // This shows the unread count badge
+                    ],
                   ),
+
                   onTap: () {
                     Navigator.push(
                       context,
@@ -284,8 +291,10 @@ Widget _buildGroupChats() {
                           overflow: TextOverflow.ellipsis,
                         );
                       },
+                      
                     ),
                   ],
+                  
                 ),
                 onTap: () {
                   Navigator.push(
@@ -306,6 +315,101 @@ Widget _buildGroupChats() {
     },
   );
 }
+
+Widget _buildUnreadBadge(String chatId) {
+  // Ensure currentUserId is not null. (Assuming currentUserId is defined in your state.)
+  if (currentUserId == null) return const SizedBox();
+
+  return StreamBuilder<QuerySnapshot>(
+    stream: FirebaseFirestore.instance
+        .collection('chats')
+        .doc(chatId)
+        .collection('messages')
+        .where('receiverId', isEqualTo: currentUserId)
+        .where('isRead', isEqualTo: false)
+        .snapshots(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const SizedBox(); // or a loading indicator if desired
+      }
+      final unreadCount = snapshot.hasData ? snapshot.data!.docs.length : 0;
+      if (unreadCount == 0) return const SizedBox();
+
+      return Container(
+        margin: const EdgeInsets.only(left: 8), // space between date and badge
+        padding: const EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          color: vividYellow,
+          shape: BoxShape.circle,
+        ),
+        constraints: const BoxConstraints(
+          minWidth: 20,
+          minHeight: 20,
+        ),
+        child: Text(
+          '$unreadCount',
+          style: const TextStyle(
+            color: darkCharcoal,
+            fontSize: 10,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      );
+    },
+  );
+}
+
+Widget _buildGroupUnreadBadge(String groupId) {
+  if (currentUserId == null) return const SizedBox();
+  
+  return StreamBuilder<QuerySnapshot>(
+    stream: FirebaseFirestore.instance
+        .collection('groups')
+        .doc(groupId)
+        .collection('messages')
+        .snapshots(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData) {
+        return const SizedBox();
+      }
+      
+      // Filter messages where currentUserId is not in the 'readBy' list.
+      final unreadMessages = snapshot.data!.docs.where((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        final List<dynamic> readBy = data['readBy'] ?? [];
+        return !readBy.contains(currentUserId);
+      }).toList();
+      
+      final int unreadCount = unreadMessages.length;
+      if (unreadCount == 0) return const SizedBox();
+
+      return Container(
+        margin: const EdgeInsets.only(left: 8),
+        padding: const EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          color: vividYellow,
+          shape: BoxShape.circle,
+        ),
+        constraints: const BoxConstraints(
+          minWidth: 16,
+          minHeight: 16,
+        ),
+        child: Center(
+          child: Text(
+            '$unreadCount',
+            style: const TextStyle(
+              color: darkCharcoal,
+              fontSize: 10,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    },
+  );
+}
+
+
 
 
 

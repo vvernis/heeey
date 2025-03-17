@@ -86,6 +86,15 @@ class _ProfileSetupStep5State extends State<ProfileSetupStep5> {
   }
 
   Future<void> _saveData() async {
+    if (_images.any((element) => element == null)) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Please select all pictures before proceeding.'),
+      ),
+    );
+    return; // Stop further execution if validation fails.
+  }
+  
     try {
       Map<String, String> base64Images = {};
 
@@ -166,7 +175,7 @@ Widget build(BuildContext context) {
               shrinkWrap: true, // Ensures GridView takes only necessary space
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
-                childAspectRatio: 0.8,
+                childAspectRatio: 0.7,
                 crossAxisSpacing: 8,
                 mainAxisSpacing: 8,
               ),

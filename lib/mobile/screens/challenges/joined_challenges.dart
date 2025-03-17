@@ -521,11 +521,40 @@ class _JoinedChallengeDetailScreenState
     }
   }
 
-  Future<void> _showSubmissionPreview(BuildContext context) async {
-  final currentUser = FirebaseAuth.instance.currentUser;
-  if (currentUser == null) return;
+ Future<void> _showSubmissionPreview(BuildContext context) async {
+  // Show a dialog to let user choose between camera and gallery.
+  final ImageSource? source = await showDialog<ImageSource>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: offBlack,
+        title: const Text(
+          "Select Image Source",
+          style: TextStyle(color: lightGray, fontFamily: 'Karla'),
+        ),
+        content: const Text(
+          "Choose whether to take a new photo or select one from your gallery.",
+          style: TextStyle(color: lightGray, fontFamily: 'Karla'),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, ImageSource.camera),
+            child: const Text("Camera", style: TextStyle(color: vividYellow)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, ImageSource.gallery),
+            child: const Text("Gallery", style: TextStyle(color: vividYellow)),
+          ),
+        ],
+      );
+    },
+  );
 
-  final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+  // If the user cancels, source will be null.
+  if (source == null) return;
+
+  // Pick image from the selected source.
+  final XFile? pickedFile = await _picker.pickImage(source: source);
   if (pickedFile == null) return;
 
   final File file = File(pickedFile.path);
@@ -623,6 +652,7 @@ class _JoinedChallengeDetailScreenState
     },
   );
 }
+
 
 Future<void> _finalizeSubmission(
     BuildContext context, String base64Image, bool allowVoting) async {

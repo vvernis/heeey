@@ -1002,6 +1002,16 @@ Future<void> _addOrUpdateChallenge({DocumentSnapshot? challengeDoc}) async {
                                     return;
                                   }
 
+                                  // NEW VALIDATION: Check if end date is before start date.
+                                  if (_startDate != null &&
+                                      _endDate != null &&
+                                      _endDate!.isBefore(_startDate!)) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text("End date cannot be before start date")),
+                                    );
+                                    return;
+                                  }
+
                                   // Build challenge data
                                   final base64Image = _challengeImageBytes != null
                                       ? base64Encode(_challengeImageBytes!)

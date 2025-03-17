@@ -170,7 +170,7 @@ return {
                         borderRadius: BorderRadius.circular(12)
                       ),
                       child: Text(
-                        "$participantCount Said HEEEY! \u{1F44B} \n @ $placeName",
+                        "$participantCount users shared pictures \u{1F44B} \n @ $placeName",
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           color: lightGray,

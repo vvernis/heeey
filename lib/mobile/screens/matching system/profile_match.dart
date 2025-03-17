@@ -575,7 +575,7 @@ Widget _buildProfileCard(Map<String, dynamic> data, Map<String, String> images) 
                 "That's ME",
                 style: const TextStyle(
                   fontFamily: 'Karla',
-                  fontSize: 15,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: lightGray,
                 ),
@@ -589,6 +589,7 @@ Widget _buildProfileCard(Map<String, dynamic> data, Map<String, String> images) 
                   crossAxisCount: 3,
                   crossAxisSpacing: 2,
                   mainAxisSpacing: 2,
+                  childAspectRatio: 0.95,
                 ),
                 itemCount: images.keys.length,
                 itemBuilder: (context, index) {
@@ -607,10 +608,10 @@ Widget _buildProfileCard(Map<String, dynamic> data, Map<String, String> images) 
                           fit: BoxFit.cover,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 1),
                       Text(
                         category,
-                        style: const TextStyle(fontFamily: 'Karla', fontSize: 12, color: lightGray),
+                        style: const TextStyle(fontFamily: 'Karla', fontSize: 11, color: lightGray),
                       ),
                     ],
                   );
@@ -634,7 +635,7 @@ Widget _buildProfileCard(Map<String, dynamic> data, Map<String, String> images) 
         'My Interests',
         style: const TextStyle(
           fontFamily: 'Karla',
-          fontSize: 15,
+          fontSize: 14,
           fontWeight: FontWeight.bold,
           color: lightGray,
         ),

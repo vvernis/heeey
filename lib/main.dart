@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:heeey/mobile/screens/challenges/joined_challenges.dart';
 import 'package:heeey/mobile/screens/matching%20system/match_home.dart';
 import 'package:heeey/mobile/screens/memory%20gallery/memory_gallery.dart';
 import 'package:heeey/mobile/screens/reset_password.dart';
@@ -64,6 +65,7 @@ class MyApp extends StatelessWidget {
       groupID: ModalRoute.of(context)!.settings.arguments as String,
       groupName: ModalRoute.of(context)!.settings.arguments as String,
     ),
+    '/joined-challenges': (context) => JoinedChallengesScreen(),
         '/match-home': (context) => const MatchingSystemHome(),
         '/notifications': (context) => const NotificationsScreen(),
         '/chats': (context) => const ChatsScreen(),

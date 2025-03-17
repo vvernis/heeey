@@ -19,6 +19,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  print("Admin Web App Version: 1.0.3 - ${DateTime.now()}");
   runApp(const AdminApp());
 }
 
