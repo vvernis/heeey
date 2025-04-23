@@ -7,12 +7,12 @@ import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:heeey/mobile/screens/memory%20gallery/memory_gallery.dart';
 import 'package:latlong2/latlong.dart';
 
-/// A simple model for each gallery item.
+
 class GalleryItem {
   final double lat;
   final double lng;
-  final String image; // Base64-encoded image
-  final int participantCount; // Number of unique participants at this location
+  final String image;
+  final int participantCount; 
 
   GalleryItem({
     required this.lat,
